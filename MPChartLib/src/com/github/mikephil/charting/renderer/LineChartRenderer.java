@@ -441,9 +441,6 @@ public class LineChartRenderer extends LineScatterCandleRadarRenderer {
                 int minx = Math.max(dataSet.getEntryIndex(entryFrom), 0);
                 int maxx = Math.min(dataSet.getEntryIndex(entryTo) + 1, entryCount);
 
-                dataSet.calcMinMax(0, dataSet.getEntryCount() - 1);
-
-
                 float[] positions = trans.generateTransformedValuesLine(
                         dataSet, mAnimator.getPhaseX(), mAnimator.getPhaseY(), minx, maxx);
 
@@ -459,10 +456,9 @@ public class LineChartRenderer extends LineScatterCandleRadarRenderer {
                         continue;
 
                     Entry entry = dataSet.getEntryForIndex(j / 2 + minx);
-                    if (entry.getVal() == dataSet.getYMin() || entry.getVal() == dataSet.getYMax()) {
-                        drawValue(c, dataSet.getValueFormatter(), entry.getVal(), entry, i, x,
-                                y - valOffset);
-                    }
+
+                    drawValue(c, dataSet.getValueFormatter(), entry.getVal(), entry, i, x,
+                            y - valOffset);
                 }
             }
         }
