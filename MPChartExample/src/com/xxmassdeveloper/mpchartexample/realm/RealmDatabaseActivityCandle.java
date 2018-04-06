@@ -7,7 +7,7 @@ import android.view.WindowManager;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.CandleStickChart;
-import com.github.mikephil.charting.data.realm.implementation.RealmCandleData;
+import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.realm.implementation.RealmCandleDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.xxmassdeveloper.mpchartexample.R;
@@ -51,22 +51,23 @@ public class RealmDatabaseActivityCandle extends RealmBaseActivity {
 
     private void setData() {
 
-        RealmResults<RealmDemoData> result = mRealm.allObjects(RealmDemoData.class);
+        RealmResults<RealmDemoData> result = mRealm.where(RealmDemoData.class).findAll();
 
-        RealmCandleDataSet<RealmDemoData> set = new RealmCandleDataSet<RealmDemoData>(result, "high", "low", "open", "close", "xIndex");
-        set.setLabel("Realm Realm CandleDataSet");
+        RealmCandleDataSet<RealmDemoData> set = new RealmCandleDataSet<RealmDemoData>(result, "xValue", "high", "low", "open", "close");
+        set.setLabel("Realm CandleDataSet");
         set.setShadowColor(Color.DKGRAY);
         set.setShadowWidth(0.7f);
         set.setDecreasingColor(Color.RED);
-        set.setDecreasingPaintStyle(Paint.Style.STROKE);
+        set.setDecreasingPaintStyle(Paint.Style.FILL);
         set.setIncreasingColor(Color.rgb(122, 242, 84));
-        set.setIncreasingPaintStyle(Paint.Style.FILL);
+        set.setIncreasingPaintStyle(Paint.Style.STROKE);
+        set.setNeutralColor(Color.BLUE);
 
         ArrayList<ICandleDataSet> dataSets = new ArrayList<ICandleDataSet>();
         dataSets.add(set); // add the dataset
 
         // create a data object with the dataset list
-        RealmCandleData data = new RealmCandleData(result, "xValue", dataSets);
+        CandleData data = new CandleData(dataSets);
         styleData(data);
 
         // set data

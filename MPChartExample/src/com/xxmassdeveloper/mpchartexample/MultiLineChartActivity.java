@@ -16,8 +16,6 @@ import com.github.mikephil.charting.components.Legend.LegendPosition;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.filter.Approximator;
-import com.github.mikephil.charting.data.filter.Approximator.ApproximatorType;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -54,11 +52,10 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
         mChart.setOnChartValueSelectedListener(this);
         
         mChart.setDrawGridBackground(false);
-        mChart.setDescription("");
+        mChart.getDescription().setEnabled(false);
         mChart.setDrawBorders(false);
 
-        mChart.getAxisLeft().setDrawAxisLine(false);
-        mChart.getAxisLeft().setDrawGridLines(false);
+        mChart.getAxisLeft().setEnabled(false);
         mChart.getAxisRight().setDrawAxisLine(false);
         mChart.getAxisRight().setDrawGridLines(false);
         mChart.getXAxis().setDrawAxisLine(false);
@@ -78,7 +75,10 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
         mSeekBarY.setProgress(100);
 
         Legend l = mChart.getLegend();
-        l.setPosition(LegendPosition.RIGHT_OF_CHART);
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
     }
 
     @Override
@@ -155,25 +155,6 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
                 mChart.invalidate();
                 break;
             }
-            case R.id.actionToggleFilter: {
-
-                // the angle of filtering is 35°
-                Approximator a = new Approximator(ApproximatorType.DOUGLAS_PEUCKER, 35);
-
-                if (!mChart.isFilteringEnabled()) {
-                    mChart.enableFiltering(a);
-                } else {
-                    mChart.disableFiltering();
-                }
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionToggleStartzero: {
-                mChart.getAxisLeft().setStartAtZero(!mChart.getAxisLeft().isStartAtZeroEnabled());
-                mChart.getAxisRight().setStartAtZero(!mChart.getAxisRight().isStartAtZeroEnabled());
-                mChart.invalidate();
-                break;
-            }
             case R.id.actionSave: {
                 // mChart.saveToGallery("title"+System.currentTimeMillis());
                 mChart.saveToPath("title" + System.currentTimeMillis(), "");
@@ -210,11 +191,6 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
         tvX.setText("" + (mSeekBarX.getProgress()));
         tvY.setText("" + (mSeekBarY.getProgress()));
 
-        ArrayList<String> xVals = new ArrayList<String>();
-        for (int i = 0; i < mSeekBarX.getProgress(); i++) {
-            xVals.add((i) + "");
-        }
- 
         ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
 
         for (int z = 0; z < 3; z++) {
@@ -223,12 +199,12 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
 
             for (int i = 0; i < mSeekBarX.getProgress(); i++) {
                 double val = (Math.random() * mSeekBarY.getProgress()) + 3;
-                values.add(new Entry((float) val, i));
+                values.add(new Entry(i, (float) val));
             }
 
             LineDataSet d = new LineDataSet(values, "DataSet " + (z + 1));
             d.setLineWidth(2.5f);
-            d.setCircleSize(4f);
+            d.setCircleRadius(4f);
 
             int color = mColors[z % mColors.length];
             d.setColor(color);
@@ -241,16 +217,16 @@ public class MultiLineChartActivity extends DemoBase implements OnSeekBarChangeL
         ((LineDataSet) dataSets.get(0)).setColors(ColorTemplate.VORDIPLOM_COLORS);
         ((LineDataSet) dataSets.get(0)).setCircleColors(ColorTemplate.VORDIPLOM_COLORS);
 
-        LineData data = new LineData(xVals, dataSets);
+        LineData data = new LineData(dataSets);
         mChart.setData(data);
         mChart.invalidate();
     }
 
     @Override
-    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+    public void onValueSelected(Entry e, Highlight h) {
         Log.i("VAL SELECTED",
-                "Value: " + e.getVal() + ", xIndex: " + e.getXIndex()
-                        + ", DataSet index: " + dataSetIndex);
+                "Value: " + e.getY() + ", xIndex: " + e.getX()
+                        + ", DataSet index: " + h.getDataSetIndex());
     }
 
     @Override
